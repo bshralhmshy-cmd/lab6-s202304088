@@ -1,0 +1,35 @@
+name: Lab6-Pipeline-s202304088
+
+on: [push, workflow_dispatch]
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile Java files
+        run: javac PasswordValidator.java PasswordValidatorTest.java
+      - uses: actions/upload-artifact@v4
+        with:
+          name: classes
+          path: "*.class"
+
+  test:
+    name: Test
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: classes
+      - name: Run tests
+        run: java PasswordValidatorTest
+
+  deploy:
+    name: Deploy
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy application
+        run: echo "Deploying application..."
